@@ -4,10 +4,15 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PackageVersion>0.1.0-alpha-1</PackageVersion>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RootNamespace>LanguageExt</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="LanguageExt.Core" Version="5.0.0-beta-77" />
+      <None Include="../README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
 </Project>
