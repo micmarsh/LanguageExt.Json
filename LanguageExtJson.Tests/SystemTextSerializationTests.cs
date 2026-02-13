@@ -35,6 +35,20 @@ public class SystemTextSerializationTests(ITestOutputHelper output)
     }
     
     [Theory]
+    [InlineData(null)]
+    [InlineData(1)]
+    [InlineData(-12345)]
+    public void SystemTextSerialize_WhenOptionWithValueType_ShouldWork(int? value)
+    {
+        // Arrange
+        var @object = Optional(value);
+        // Act
+        var result = SystemTextRoundTrip<Option<int>>(@object);
+        // Assert
+        Assert.Equal(@object, result);
+    }
+    
+    [Theory]
     [InlineData()]
     [InlineData(1, 2, 3)]
     [InlineData(1, 2, 3, 4, 5, 6 ,7, 7, 8, 9, 0, 9, 8, 7, 6, 5, 4, 3, 2, 1)]

@@ -26,12 +26,12 @@ public class OptionConverterFactory : JsonConverterFactory
 
     private class OptionConverter<T>(JsonSerializerOptions options) : JsonConverter<Option<T>>
     {
+        private static readonly Type Type = typeof(T);
+        
         public override Option<T> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions _)
-            => Prelude.Optional(JsonSerializer.Deserialize<T>(ref reader, options));
+            => Prelude.Optional(JsonSerializer.Deserialize<T?>(ref reader, options));
         
         public override void Write(Utf8JsonWriter writer, Option<T> value, JsonSerializerOptions _) =>
-            JsonSerializer.Serialize(writer,
-                value.Match(T? (v) => v, () => default),
-                options);
+            JsonSerializer.Serialize(writer, value.Case, options);
     }
 }
