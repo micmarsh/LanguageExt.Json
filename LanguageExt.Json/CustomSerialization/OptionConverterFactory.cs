@@ -19,7 +19,7 @@ public class OptionConverterFactory : JsonConverterFactory
         var typeArg = typeToConvert.GetGenericArguments()[0];
         if (typeArg.IsGenericType && typeArg.GetGenericTypeDefinition() == GenericOption)
         {
-            throw new JsonException("OptionConverterFactory cannot create converter for nested Option<Option<>>s due to ambiguity in deserialization");
+            throw new JsonException($"{nameof(OptionConverterFactory)} cannot create converter for nested Option<Option<>>s due to potential ambiguity in deserialization");
         }
         return (JsonConverter?)Activator.CreateInstance(
             ConverterType.MakeGenericType(typeArg),

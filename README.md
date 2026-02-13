@@ -1,9 +1,10 @@
 # LanguageExt.Json
 
 ## Currently under construction
-* TDD'ing custom serdes for Option and Seq
-* Create "sanity check" tests for main methods
 * Flesh out this README with usage details
+  * Mention custom converters (actual main "selling point")
+  * some explanation of "lens-like" queries, imagined main "selling point"
+  * issue for future abstraction over system.text and newtonsoft
 
 Copyright 2026 Michael Marsh
 
