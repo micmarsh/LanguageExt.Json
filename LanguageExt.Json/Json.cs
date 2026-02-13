@@ -36,9 +36,10 @@ public static class Json<F> where F : Fallible<F>, Applicative<F>
             throw new JsonException($"Could not deserialize json result {limitLength(str)} to {typeof(Result).Name}"))
         .Catch(err => new JsonError(err.Message, err));
     
-    public static K<F, string> serialize(object? str)
-        => @try(() => JsonSerializer.Serialize(str))
-            .Catch(err => new JsonError(err.Message, err));
+    public static K<F, string> serialize(object? obj)
+        => @try(() => JsonSerializer.Serialize(obj))
+            .Catch(err => new JsonError($"Couldn't serialize {obj?.GetType().Name} " +
+                                        $"'{limitLength(obj?.ToString() ?? "")}': {err.Message}", err));
     
     public static Func<JsonElement, K<F, JsonElement>> key(string objKey) => json => key(objKey, json);
 
