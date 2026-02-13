@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace LanguageExtJson.Tests;
 
 using LanguageExt;

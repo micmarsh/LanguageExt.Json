@@ -8,6 +8,11 @@ namespace LanguageExt;
 
 public static class Json<F> where F : Fallible<F>, Applicative<F>
 {
+    private static readonly JsonSerializerOptions Options = new JsonSerializerOptions
+    {
+        Converters = { new OptionConverterFactory(), new SeqConverterFactory() }
+    };
+    
     private static K<F, A> @try<A>(Func<A> run) => Try.lift(run).Match(F.Pure, F.Fail<A>);
 
     public static K<F, JsonElement> parse(Stream stream) 
@@ -20,24 +25,24 @@ public static class Json<F> where F : Fallible<F>, Applicative<F>
 
     public static K<F, Result> cast<Result>(JsonElement json)
         => @try<Result>(() =>
-            json.Deserialize<Result>() ??
+            json.Deserialize<Result>(Options) ??
             throw new JsonException($"Could not convert json element {json.ValueKind} to {typeof(Result).Name}"))
         .Catch(err => new JsonError(err.Message, err));
     
     public static K<F, Result> deserialize<Result>(Stream stream)
-        => @try<Result>(() => JsonSerializer.Deserialize<Result>(stream) ??
+        => @try<Result>(() => JsonSerializer.Deserialize<Result>(stream, Options) ??
                               throw new JsonException(
                                   $"Could not deserialize json stream result to {typeof(Result).Name}"))
             .Catch(err => new JsonError(err.Message, err));
     
     public static K<F, Result> deserialize<Result>(string str)
         => @try<Result>(() =>
-            JsonSerializer.Deserialize<Result>(str) ??
+            JsonSerializer.Deserialize<Result>(str, Options) ??
             throw new JsonException($"Could not deserialize json result {limitLength(str)} to {typeof(Result).Name}"))
         .Catch(err => new JsonError(err.Message, err));
     
     public static K<F, string> serialize(object? obj)
-        => @try(() => JsonSerializer.Serialize(obj))
+        => @try(() => JsonSerializer.Serialize(obj, Options))
             .Catch(err => new JsonError($"Couldn't serialize {obj?.GetType().Name} " +
                                         $"'{limitLength(obj?.ToString() ?? "")}': {err.Message}", err));
     
