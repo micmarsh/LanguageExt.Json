@@ -19,4 +19,11 @@
         <ProjectReference Include="../LanguageExt.Json/LanguageExt.Json.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="TestProduct.json" />
+      <Content Include="TestProduct.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>
