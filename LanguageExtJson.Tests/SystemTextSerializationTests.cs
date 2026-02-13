@@ -65,10 +65,5 @@ public class SystemTextSerializationTests(ITestOutputHelper output)
 
     private T SystemTextRoundTrip<T>(object @object) =>
         // JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(@object));
-        (Json<Fin>.serialize(@object) >> Json<Fin>.deserialize<T>)
-        .Catch(error =>
-        {
-            output.WriteLine(error.ToString());
-            return error;
-        }).As().ThrowIfFail();
+        (Json<Fin>.serialize(@object) >> Json<Fin>.deserialize<T>).ThrowIfFail();
 }
