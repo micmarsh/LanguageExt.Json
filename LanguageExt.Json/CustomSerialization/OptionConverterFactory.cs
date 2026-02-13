@@ -17,6 +17,10 @@ public class OptionConverterFactory : JsonConverterFactory
     public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
     {
         var typeArg = typeToConvert.GetGenericArguments()[0];
+        if (typeArg.IsGenericType && typeArg.GetGenericTypeDefinition() == GenericOption)
+        {
+            throw new JsonException("OptionConverterFactory cannot create converter for nested Option<Option<>>s due to ambiguity in deserialization");
+        }
         return (JsonConverter?)Activator.CreateInstance(
             ConverterType.MakeGenericType(typeArg),
             BindingFlags.Instance | BindingFlags.Public,

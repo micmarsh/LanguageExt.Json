@@ -67,12 +67,12 @@ public class SystemTextSerializationTests(ITestOutputHelper output)
     {
         // Arrange
         var @object = Seq(
-            Some(Some(Seq(1, 2, 3))), 
-            Some<Option<Seq<int>>>(None),
-            Some(Some<Seq<int>>(Empty)),
+            Some(Seq(Some(1),None, Some(3))), 
+            Some<Seq<Option<int>>>(Empty),
+            Some(Seq<Option<int>>(None)),
             None);
         // Act
-        var result = SystemTextRoundTrip<Seq<Option<Option<Seq<int>>>>>(@object);
+        var result = SystemTextRoundTrip<Seq<Option<Seq<Option<int>>>>>(@object);
         // Assert
         Assert.Equal(@object, result);
     }

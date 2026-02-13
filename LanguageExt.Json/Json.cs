@@ -8,7 +8,7 @@ namespace LanguageExt;
 
 public static class Json<F> where F : Fallible<F>, Applicative<F>
 {
-    private static readonly JsonSerializerOptions Options = new JsonSerializerOptions
+    private static readonly JsonSerializerOptions Options = new ()
     {
         Converters = { new OptionConverterFactory(), new SeqConverterFactory() }
     };
