@@ -35,7 +35,10 @@ public static class Json<F> where F : Fallible<F>, Applicative<F>
             JsonSerializer.Deserialize<Result>(str) ??
             throw new JsonException($"Could not deserialize json result {limitLength(str)} to {typeof(Result).Name}"))
         .Catch(err => new JsonError(err.Message, err));
-
+    
+    public static K<F, string> serialize(object? str)
+        => @try(() => JsonSerializer.Serialize(str))
+            .Catch(err => new JsonError(err.Message, err));
     
     public static Func<JsonElement, K<F, JsonElement>> key(string objKey) => json => key(objKey, json);
 
@@ -73,7 +76,13 @@ public static class Json<F> where F : Fallible<F>, Applicative<F>
 public record JsonError(string Message, Option<Error> Inner = default) : Expected(Message, Code, Inner)
 {
     public const int Code = 7654;
+    public override ErrorException ToErrorException()
+        => new JsonErrorException(Message, Inner.Map(e => e.ToErrorException()));
 }
+
+public class JsonErrorException(string message, Option<ErrorException> inner = default)
+    : ExpectedException(message, JsonError.Code, inner);
+
 
 [Obsolete("Hopefully will be in main lib soon https://github.com/louthy/language-ext/pull/1539")]
 public static class Kleisli
