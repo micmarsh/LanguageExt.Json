@@ -14,8 +14,7 @@ public class ObjectTraversalTests
     {
         // Arrange
         var getReviewers = key("reviews") >> iterate >>
-                           (elts => elts.Traverse(key("reviewerEmail"))) >>
-                           (elts => elts.Traverse(cast<string>));
+                           traverse(key("reviewerEmail") >> cast<string>);
         // Act
         var emails = parse(ProductString.Value).Bind(getReviewers).As().ThrowIfFail();
         

@@ -69,6 +69,18 @@ public static class Json<F> where F : Fallible<F>, Applicative<F>
     public static K<F, JsonElement> index(Index idx, JsonElement json) =>
         @try(() => json[idx.Value]).Catch(err => new JsonError(indexErrorMessage(idx, json), err));
 
+    /// <summary>
+    /// Not strictly related to JSON, but seemingly not found and prelude and helpful for many usages here
+    /// </summary>
+    public static K<F, Seq<B>> traverse<A, B>(Func<A, K<F, B>> f, Seq<A> seq)
+        => seq.Traverse(f);
+
+    /// <summary>
+    /// Not strictly related to JSON, but seemingly not found and prelude and helpful for many usages here
+    /// </summary>
+    public static Func<Seq<A>, K<F, Seq<B>>> traverse<A, B>(Func<A, K<F, B>> f)
+        => seq => traverse(f, seq);
+    
     private static string indexErrorMessage(Index idx, JsonElement json) =>
         $"Unable to lookup index {idx.Value} in {json.ValueKind}: " + (json.ValueKind == JsonValueKind.Array
             ? $"array is length {json.EnumerateArray().Count()}"

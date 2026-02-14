@@ -4,6 +4,7 @@
 * Flesh out this README with usage details
   * Mention custom converters (actual main "selling point")
   * some explanation of "lens-like" queries, imagined main "selling point"
+  * link to Http for further examples
   * issue for future abstraction over system.text and newtonsoft
 
 Copyright 2026 Michael Marsh
