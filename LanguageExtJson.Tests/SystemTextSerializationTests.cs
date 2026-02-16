@@ -7,7 +7,7 @@ using static LanguageExt.Prelude;
 
 namespace LanguageExtJson.Tests;
 
-public class SystemTextSerializationTests(ITestOutputHelper output)
+public class SystemTextSerializationTests
 {
     private record TypesTest(int Int, Option<string> Opt, Seq<int> Seq);
     [Fact]
@@ -89,12 +89,16 @@ public class SystemTextSerializationTests(ITestOutputHelper output)
             => JsonSerializer.Serialize(writer, value.Value, options);
     }
 
+    public SystemTextSerializationTests()
+    {
+        GlobalJsonConfig.AddCustomConverters(new UserIdConverter());
+    }
+
     [Fact]
     public void SystemTextSerialize_WhenCustomType_ShouldWork()
     {
         // Arrange
         var @object = new UserId(123);
-        GlobalJsonConfig.AddCustomConverters(new UserIdConverter());
         // Act
         var result = SystemTextRoundTrip<UserId>(@object);
         // Assert

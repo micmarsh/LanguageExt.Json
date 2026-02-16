@@ -11,23 +11,29 @@ public static class GlobalJsonConfig
 {
     private static readonly List<JsonConverter> OtherConverters = new ();
     
-    internal static Lazy<JsonSerializerOptions> Options = new (() =>
+    // todo in the far future: benchmark whether setting up some kind of cache based on size of OtherConverters is worthwhile
+    public static JsonSerializerOptions Options
     {
-        var options = new JsonSerializerOptions()
+        get
         {
-            Converters = { new OptionConverterFactory(), new SeqConverterFactory() }
-        };
-        OtherConverters.ForEach(options.Converters.Add);
-        return options;
-    });
+            var options = new JsonSerializerOptions()
+            {
+                Converters = { new OptionConverterFactory(), new SeqConverterFactory() }
+            };
+            OtherConverters.ForEach(options.Converters.Add);
+            return options;
+        }
+    }
 
     public static void AddCustomConverters(params JsonConverter[] converters)
-        => OtherConverters.AddRange(converters);
+    { 
+        OtherConverters.AddRange(converters);
+    }
 }
 
 public static class Json<F> where F : Fallible<F>, Applicative<F>
 {
-    private static JsonSerializerOptions Options => GlobalJsonConfig.Options.Value;
+    private static JsonSerializerOptions Options => GlobalJsonConfig.Options;
     
     private static K<F, A> @try<A>(Func<A> run) => Try.lift(run).Match(F.Pure, F.Fail<A>);
 
