@@ -15,6 +15,7 @@ public class ObjectTraversalTests
         // Arrange
         var getReviewers = key("reviews") >> iterate >>
                            traverse(key("reviewerEmail") >> cast<string>);
+                            //   traverse<JsonElement, string>(cast<string>) //Type inference having trouble with Seq<A>
         // Act
         var emails = parse(ProductString.Value).Bind(getReviewers).As().ThrowIfFail();
         
