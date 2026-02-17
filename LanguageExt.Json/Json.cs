@@ -36,20 +36,6 @@ public static class Json<F> where F : Fallible<F>, Applicative<F>
     private static JsonSerializerOptions Options => GlobalJsonConfig.Options;
     
     private static K<F, A> @try<A>(Func<A> run) => Try.lift(run).Match(F.Pure, F.Fail<A>);
-
-    public static K<F, JsonElement> parse(Stream stream) 
-        => @try(() => JsonDocument.Parse(stream).RootElement)
-            .Catch(err => new JsonError("Could not parse json stream", err));
-
-    public static K<F, JsonElement> parse(string str) 
-        => @try(() => JsonDocument.Parse(str).RootElement)
-            .Catch(err => new JsonError($"Could not parse json result {limitLength(str)}", err));
-
-    public static K<F, Result> cast<Result>(JsonElement json)
-        => @try<Result>(() =>
-            json.Deserialize<Result>(Options) ??
-            throw new JsonException($"Could not convert json element {json.ValueKind} to {typeof(Result).Name}"))
-        .Catch(err => new JsonError(err.Message, err));
     
     public static K<F, Result> deserialize<Result>(Stream stream)
         => @try<Result>(() => JsonSerializer.Deserialize<Result>(stream, Options) ??
@@ -59,14 +45,22 @@ public static class Json<F> where F : Fallible<F>, Applicative<F>
     
     public static K<F, Result> deserialize<Result>(string str)
         => @try<Result>(() =>
-            JsonSerializer.Deserialize<Result>(str, Options) ??
-            throw new JsonException($"Could not deserialize json result {limitLength(str)} to {typeof(Result).Name}"))
-        .Catch(err => new JsonError(err.Message, err));
+                JsonSerializer.Deserialize<Result>(str, Options) ??
+                throw new JsonException($"Could not deserialize json result {limitLength(str)} to {typeof(Result).Name}"))
+            .Catch(err => new JsonError(err.Message, err));
     
     public static K<F, string> serialize(object? obj)
         => @try(() => JsonSerializer.Serialize(obj, Options))
             .Catch(err => new JsonError($"Couldn't serialize {obj?.GetType().Name} " +
                                         $"'{limitLength(obj?.ToString() ?? "")}': {err.Message}", err));
+
+    public static K<F, JsonElement> parse(Stream stream) 
+        => @try(() => JsonDocument.Parse(stream).RootElement)
+            .Catch(err => new JsonError("Could not parse json stream", err));
+
+    public static K<F, JsonElement> parse(string str) 
+        => @try(() => JsonDocument.Parse(str).RootElement)
+            .Catch(err => new JsonError($"Could not parse json result {limitLength(str)}", err));
     
     public static Func<JsonElement, K<F, JsonElement>> key(string objKey) => json => key(objKey, json);
 
@@ -92,16 +86,22 @@ public static class Json<F> where F : Fallible<F>, Applicative<F>
         @try(() => json[idx.Value]).Catch(err => new JsonError(indexErrorMessage(idx, json), err));
 
     /// <summary>
-    /// Not strictly related to JSON, but seemingly not found and prelude and helpful for many usages here
+    /// Not strictly related to JSON, but seemingly not found in Prelude and helpful for many usages here
     /// </summary>
     public static K<F, Seq<B>> traverse<A, B>(Func<A, K<F, B>> f, Seq<A> seq)
         => seq.Traverse(f);
 
     /// <summary>
-    /// Not strictly related to JSON, but seemingly not found and prelude and helpful for many usages here
+    /// Not strictly related to JSON, but seemingly not found in Prelude and helpful for many usages here
     /// </summary>
     public static Func<Seq<A>, K<F, Seq<B>>> traverse<A, B>(Func<A, K<F, B>> f)
         => seq => traverse(f, seq);
+    
+    public static K<F, Result> cast<Result>(JsonElement json)
+        => @try<Result>(() =>
+                json.Deserialize<Result>(Options) ??
+                throw new JsonException($"Could not convert json element {json.ValueKind} to {typeof(Result).Name}"))
+            .Catch(err => new JsonError(err.Message, err));
     
     private static string indexErrorMessage(Index idx, JsonElement json) =>
         $"Unable to lookup index {idx.Value} in {json.ValueKind}: " + (json.ValueKind == JsonValueKind.Array
