@@ -53,6 +53,6 @@
     "barcode": "9164035109868",
     "qrCode": "..."
   },
-  "thumbnail": "...",
+  "thumbnail": null,
   "images": ["...", "...", "..."]
 }

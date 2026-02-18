@@ -7,30 +7,6 @@ using static LanguageExt.Prelude;
 
 namespace LanguageExt;
 
-public static class GlobalJsonConfig
-{
-    private static readonly List<JsonConverter> OtherConverters = new ();
-    
-    // todo in the far future: benchmark whether setting up some kind of cache based on size of OtherConverters is worthwhile
-    public static JsonSerializerOptions Options
-    {
-        get
-        {
-            var options = new JsonSerializerOptions()
-            {
-                Converters = { new OptionConverterFactory(), new SeqConverterFactory() }
-            };
-            OtherConverters.ForEach(options.Converters.Add);
-            return options;
-        }
-    }
-
-    public static void AddCustomConverters(params JsonConverter[] converters)
-    { 
-        OtherConverters.AddRange(converters);
-    }
-}
-
 public static class Json<F> where F : Fallible<F>, Applicative<F>
 {
     private static JsonSerializerOptions Options => GlobalJsonConfig.Options;
@@ -113,6 +89,31 @@ public static class Json<F> where F : Fallible<F>, Applicative<F>
     private static string limitLength(string str) => 
         str.Length < 100 ? str : str.Substring(0, 100) + "...";
 }
+
+public static class GlobalJsonConfig
+{
+    private static readonly List<JsonConverter> OtherConverters = new ();
+    
+    // todo in the far future: benchmark whether setting up some kind of cache based on size of OtherConverters is worthwhile
+    public static JsonSerializerOptions Options
+    {
+        get
+        {
+            var options = new JsonSerializerOptions()
+            {
+                Converters = { new OptionConverterFactory(), new SeqConverterFactory() }
+            };
+            OtherConverters.ForEach(options.Converters.Add);
+            return options;
+        }
+    }
+
+    public static void AddCustomConverters(params JsonConverter[] converters)
+    { 
+        OtherConverters.AddRange(converters);
+    }
+}
+
 public record JsonError(string Message, Option<Error> Inner = default) : Expected(Message, Code, Inner)
 {
     public const int Code = 7654;
