@@ -85,11 +85,37 @@ Zooming in on the right side of `var emails = ...`, we see several (monadic) ope
 As there are obviously lots of potential failure points at every step of this query, each method returns the
 type specified in the static import, with a hopefully useful `JsonError` (derived from `Error` and has its own `JsonError.Code`) to
 aid in issue diagnosis.
+```csharp
+
+```
 
 Since nearly all types used with this library will also be `Monad`s, and all of the 
 above methods are "curried" (using C# overloaded methods) we can use `>>` to chain these operations in a visually elegant way.
 
-### 
+### Other Examples
+See the [example file in LanguageExt.Http](https://github.com/micmarsh/LanguageExt.Http/blob/master/LanguageExtHttp.Examples/JsonParsingExample.cs) for a 
+more-realistic-but-ultimately-still-contrived example of how this might work "in the wild", and with a custom monad type.
+
+## Provided and Custom Converters
+This library, as mentioned above, provides converters for `Seq` and `Option` that it will use automatically for any 
+serialization or deserialization operation.
+
+To provide your own custom converters, use `GlobalJsonConfig.AddCustomConverters`, like so
+```csharp
+// you'll likely call this in Startup.cs or similar area of application
+GlobalJsonConfig.AddCustomConverters(new MyCustomConverter(), new MyCustomFactory())
+```
+While this is explicitly a global(!) mutable(!!!) variable, the vast majority of applications are only ever 
+going to want to define custom converters once, so this makes the most sense egonomically, especially compared
+to the main alternative of some kind of configuration threaded through a `Readable` monad.
+
+## TODOs
+* Main missing feature is Newtonsoft support
+   * Very possible to add by introducing a layer of abstraction 
+between the main methods `deserialize`, `parse`, `index`, `key`, etc. and any interaction with `System.Text.Json` types,
+and then adding another parameter to the "module import" to specify which underlying json library to use.
+   * The design is fully sketched out in my head, just need to implement ;-)
+* Remove this library's Kleisli composition operator once the equivalent is in `LanguageExt.Core`
 
 Copyright 2026 Michael Marsh
 
