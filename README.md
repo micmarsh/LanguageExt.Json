@@ -3,7 +3,7 @@
 A small suite of tools based on [LanguageExt V5](https://github.com/louthy/language-ext) to enable parsing and querying json in a functional manner.
 
 ### Add Nuget Package
-`commmand line` or `package name` on nuget (**finish this once actually deployed**)
+`dotnet add package LanguageExt.Json --version 0.1.0` or `LanguageExt.Json 0.1.0` on nuget
 
 ## "Module Style" Static Import
 This library defines no new concrete types (there's no "json query monad" or anything of that sort),
