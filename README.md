@@ -1,8 +1,6 @@
 # LanguageExt.Json
 
-# WIP README Currently Under Construction
-
-A small suite of tools based on [LanguageExt V5](https://github.com/louthy/language-ext) to enable parsing and querying json in a functional manner
+A small suite of tools based on [LanguageExt V5](https://github.com/louthy/language-ext) to enable parsing and querying json in a functional manner.
 
 ### Add Nuget Package
 `commmand line` or `package name` on nuget (**finish this once actually deployed**)
@@ -86,7 +84,14 @@ As there are obviously lots of potential failure points at every step of this qu
 type specified in the static import, with a hopefully useful `JsonError` (derived from `Error` and has its own `JsonError.Code`) to
 aid in issue diagnosis.
 ```csharp
+var shouldThrow = serialize(product) >> parse
+                                     >> key("reviews")
+                                     >> key("reviewzzz");
 
+var ex = Assert.Throws<JsonErrorException>(() => shouldThrow.ThrowIfFail());
+Assert.Contains("reviewzzz", ex.Message);
+Assert.Contains(JsonValueKind.Array.ToString(), ex.Message);
+Assert.Equal(JsonError.Code, ex.Code);
 ```
 
 Since nearly all types used with this library will also be `Monad`s, and all of the 

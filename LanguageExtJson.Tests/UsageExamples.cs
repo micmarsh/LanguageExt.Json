@@ -1,3 +1,4 @@
+using System.Text.Json;
 using LanguageExt;
 using static LanguageExt.Json<LanguageExt.Fin>;
 using static LanguageExt.Prelude;
@@ -33,6 +34,22 @@ public class UsageExamples
                                    >> iterate
                                    >> traverse(key("reviewerEmail") >> cast<string>);
         Assert.Equal(product.reviews.Map(r => r.reviewerEmail), emails);
+    }
+
+    [Fact]
+    public void test_error()
+    {
+        var product = new Product2(123, [
+            new Review("foo@bar.com", 5)
+        ]);
+        var shouldThrow = serialize(product) >> parse
+                                             >> key("reviews")
+                                             >> key("reviewzzz");
+        
+        var ex = Assert.Throws<JsonErrorException>(() => shouldThrow.ThrowIfFail());
+        Assert.Contains("reviewzzz", ex.Message);
+        Assert.Contains(JsonValueKind.Array.ToString(), ex.Message);
+        Assert.Equal(JsonError.Code, ex.Code);
     }
 
 }

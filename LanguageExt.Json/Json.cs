@@ -47,14 +47,15 @@ public static class Json<F> where F : Fallible<F>, Applicative<F>
     private static string keyErrorMessage(string key, JsonElement json) =>
         $"Unable to lookup key '{key}' in {json.ValueKind}: " + (json.ValueKind == JsonValueKind.Object
             ? $"object contains keys: [{string.Join(", ", json.EnumerateObject().Select(kv => kv.Name))}]"
-            : shortToString(json));
+            : $"{shortToString(json)} is not an object");
 
     public static Option<JsonElement> safeKey(string key, JsonElement json) =>
         Try.lift(() => json.GetProperty(key)).ToOption();
 
     public static K<F, Seq<JsonElement>> iterate(JsonElement json) =>
         @try(json.EnumerateArray).Map(array => toSeq(array))
-            .Catch(err => new JsonError($"Unable to enumerate {json.ValueKind}: {shortToString(json)}"));
+            .Catch(err => new JsonError($"Unable to enumerate {json.ValueKind}: {shortToString(json)}" +
+                                        (json.ValueKind == JsonValueKind.Array ? "" : " is not an array")));
 
     public static Func<JsonElement, K<F, JsonElement>> index(Index idx) => json => index(idx, json);
     
@@ -82,7 +83,7 @@ public static class Json<F> where F : Fallible<F>, Applicative<F>
     private static string indexErrorMessage(Index idx, JsonElement json) =>
         $"Unable to lookup index {idx.Value} in {json.ValueKind}: " + (json.ValueKind == JsonValueKind.Array
             ? $"array is length {json.EnumerateArray().Count()}"
-            : shortToString(json));
+            : $"{shortToString(json)} is not an array");
 
     private static string shortToString(JsonElement json) => limitLength(json.ToString());
 
